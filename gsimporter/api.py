@@ -4,7 +4,10 @@ import json
 import os
 import pprint
 
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 STATE_PENDING = "PENDING"
 STATE_READY = "READY"
@@ -39,7 +42,7 @@ def parse_response(args, parent=None):
     headers, response = args
     try:
         resp = json.loads(response)
-    except ValueError,ex:
+    except ValueError as ex:
         _logger.warn('invalid JSON response: %s',response)
         raise ex
     if "import" in resp:
@@ -189,12 +192,12 @@ class Target(_UploadBase):
     )
 
     def _bind_json(self, json):
-        if json.has_key('href'):
+        if 'href' in json:
             self.href = json.get('href')
         store_type = [ k for k in Target._store_types  if k in json]
         if store_type:
             if len(store_type) != 1:
-                self.binding_failed('invalid store entry: %s', json.keys())
+                self.binding_failed('invalid store entry: %s', list(json.keys()))
             else:
                 self.store_type = store_type[0]
                 repr = json[self.store_type]
@@ -366,7 +369,7 @@ class Task(_UploadBase):
                 if unicode_error:
                     progress['message'] += ' - it looks like an invalid character'
                 return progress
-            except ValueError,ex:
+            except ValueError as ex:
                 _logger.warn('invalid JSON response: %s',response)
                 raise RequestFailed('invalid JSON')
         else:
@@ -407,7 +410,7 @@ class Session(_UploadBase):
             if initial_opts:
                 # pass options in as value:key parameters, this allows multiple
                 # options per key
-                base = base + '&' + '&'.join(['option=%s:%s' % (v,k) for k,v in initial_opts.iteritems()])
+                base = base + '&' + '&'.join(['option=%s:%s' % (v,k) for k,v in initial_opts.items()])
             return base
         if use_url:
             if ext == '.zip':
@@ -430,12 +433,12 @@ class Session(_UploadBase):
             t._parent = self
         self.tasks.extend(tasks)
 
-    def commit(self, async=False):
+    def commit(self, sync=False):
         """Run the session"""
         #@todo check task status if we don't have it already?
         url = self._url("imports/%s",self.id)
-        if async:
-            url = url + "?async=true&exec=true"
+        if sync:
+            url = url + "?sync=true&exec=true"
         resp, content = self._client().post(url)
         if resp.status != 204:
             raise Exception("expected 204 response code, got %s" % resp.status,content)

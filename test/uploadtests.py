@@ -24,7 +24,11 @@ import socket
 import tempfile
 import time
 import traceback
-import unittest2 as unittest
+
+try:  # python2 compatible
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 """
 PREPARATION FOR THE TESTS
@@ -234,7 +238,7 @@ class SingleImportTests(unittest.TestCase):
             pass
 
     def run_single_upload(self, vector=None, raster=None, target_store=None,
-                          delete_existing=True, async=False, mosaic=False,
+                          delete_existing=True, sync=False, mosaic=False,
                           update_mode=None, change_layer_name=None,
                           expected_srs='', target_srs=None,
                           expect_session_state='COMPLETE',
@@ -298,9 +302,9 @@ class SingleImportTests(unittest.TestCase):
             session.tasks[0].set_update_mode(update_mode)
 
         # run import and poll if required
-        session.commit(async=async)
+        session.commit(sync=sync)
         self.expected_layer = expected_layer
-        if async:
+        if sync:
             while True:
                 time.sleep(.1)
                 progress = session.tasks[0].get_progress()
@@ -367,7 +371,7 @@ class SingleImportTests(unittest.TestCase):
 
     def test_upload_to_db_async(self):
         self.run_single_upload(vector='san_andres_y_providencia_highway.shp',
-                               target_store=DB_DATASTORE_NAME, async=True)
+                               target_store=DB_DATASTORE_NAME, sync=True)
 
     def test_upload_with_bad_files(self):
         shp_files = _util.shp_files(vector_file(

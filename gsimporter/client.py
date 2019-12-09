@@ -1,5 +1,5 @@
 import os
-import _util
+from . import _util
 import pprint
 import json
 import logging
@@ -13,8 +13,11 @@ from gsimporter.api import (RequestFailed,
 # import httplib2
 import urllib3
 
-from urlparse import urlparse
-from urllib import urlencode
+try:
+    from urllib.parse import urlparse, urlencode
+except ImportError:  #python2 compatible
+    from urlparse import urlparse
+    from urllib import urlencode
 
 _logger = logging.getLogger(__name__)
 
@@ -246,15 +249,10 @@ class _Client(object):
                 }
             }}
         else:
-            # WARNING - HACK TO MAKE UPLOADS WORK 
-            # ONLY WORKS ON CERTAIN SYSTEMS AND SHOULD NOT BE MERGED INTO MASTER
-            import uuid
-            name = name if name else str(uuid.uuid4())
             import_data = {"import": {
                 "data": {
                     "type": "file",
-                    # "file": name,
-                    "file": "/usr/local/tomcat/webapps/geoserver/data/uploads/" + name,
+                    "file": name,
                     "charsetEncoding": charset_encoding
                 }
             }}
@@ -285,7 +283,7 @@ class _Client(object):
             L.append(str(value))
         for fpair in files:
             try:
-                if isinstance(fpair, basestring):
+                if isinstance(fpair, str):
                     fpair = (fpair, fpair)
             except BaseException:
                 if isinstance(fpair, str):
