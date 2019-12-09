@@ -23,7 +23,7 @@ class Client(object):
     def __init__(self, url, username=None, password=None):
         self.username = username or 'admin'
         self.password = password or 'geoserver'
-        self.client = _Client(url, username, password)
+        self.client = _Client(url, self.username, self.password)
 
     def _call(self, fun, *args):
         # call the provided function and set the _uploader field on each
@@ -106,6 +106,7 @@ class Client(object):
             name=name,
             target_store=target_store,
             charset_encoding=charset_encoding)
+
         if files:
             session.upload_task(files, use_url, intial_opts)
 
@@ -245,10 +246,15 @@ class _Client(object):
                 }
             }}
         else:
+            # WARNING - HACK TO MAKE UPLOADS WORK 
+            # ONLY WORKS ON CERTAIN SYSTEMS AND SHOULD NOT BE MERGED INTO MASTER
+            import uuid
+            name = name if name else str(uuid.uuid4())
             import_data = {"import": {
                 "data": {
                     "type": "file",
-                    "file": name,
+                    # "file": name,
+                    "file": "/usr/local/tomcat/webapps/geoserver/data/uploads/" + name,
                     "charsetEncoding": charset_encoding
                 }
             }}

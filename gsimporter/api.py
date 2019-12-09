@@ -254,6 +254,10 @@ class Layer(_UploadBase):
         data = { 'layer' : { 'name' : name }}
         self._client().put_json(self._url(None), json.dumps(data))
 
+    def set_target_srs(self, srs):
+        data = { 'layer' : { 'srs': srs }}
+        self._client().put_json(self._url(None), json.dumps(data))
+
 
 class Task(_UploadBase):
     _object_name = 'task'
