@@ -17,21 +17,26 @@ STATE_COMPLETE = "COMPLETE"
 
 _logger = logging.getLogger("gsuploader")
 
+
 class BadRequest(Exception):
     '''Encapsulate a 400 or other 'invalid' request'''
     pass
+
 
 class RequestFailed(Exception):
     '''Encapsulate a 500 or other 'failed' request'''
     pass
 
+
 class NotFound(Exception):
     '''Encapsulate an HTTP 404 or other 'missing' request'''
     pass
 
+
 class BindingFailed(Exception):
     '''Something in the API has changed'''
     pass
+
 
 def parse_response(args, parent=None):
     '''Parse a top-level concept from the provided args.
@@ -43,23 +48,25 @@ def parse_response(args, parent=None):
     try:
         resp = json.loads(response)
     except ValueError as ex:
-        _logger.warn('invalid JSON response: %s',response)
+        _logger.warn('invalid JSON response: %s', response)
         raise ex
     if "import" in resp:
         return Session(json=resp['import'], parent=parent)
     elif "task" in resp:
         return Task(resp['task'], parent=parent)
     elif "imports" in resp:
-        return [ Session(json=j, parent=parent) for j in resp['imports'] ]
+        return [Session(json=j, parent=parent) for j in resp['imports']]
     elif "tasks" in resp:
         # non-recognized file tasks have null source.format
-        return [ Task(t, parent=parent) for t in resp['tasks'] ]
+        return [Task(t, parent=parent) for t in resp['tasks']]
     raise Exception("Unknown response %s" % resp)
 
 
 _Binding = collections.namedtuple('Binding', [
         'name', 'expected', 'ro', 'binding'
     ])
+
+
 def _binding(name, expected=True, ro=True, binding=None):
     return _Binding(name, expected, ro, binding)
 
@@ -145,7 +152,7 @@ class _UploadBase(object):
                 json[binding.name] = val
         self._to_json_object_custom(json)
         if top_level and self._object_name:
-            json = { self._object_name : json }
+            json = {self._object_name: json}
         return json
 
     def _to_json_object_custom(self, json):
@@ -194,7 +201,7 @@ class Target(_UploadBase):
     def _bind_json(self, json):
         if 'href' in json:
             self.href = json.get('href')
-        store_type = [ k for k in Target._store_types  if k in json]
+        store_type = [k for k in Target._store_types if k in json]
         if store_type:
             if len(store_type) != 1:
                 self.binding_failed('invalid store entry: %s', list(json.keys()))
@@ -215,12 +222,12 @@ class Target(_UploadBase):
         :param store_name: An optional existing datastore name
         :param workspace: An optional workspace to use for referencing the store
         '''
-        dataStore = { 'enabled' : True } # workaround for importer bug
+        dataStore = {'enabled': True}  # workaround for importer bug
         if store_name:
             dataStore['name'] = store_name
         if workspace:
-            dataStore['workspace'] = { 'name' : str(workspace) }
-        target_rep = { self.store_type : dataStore }
+            dataStore['workspace'] = {'name': str(workspace)}
+        target_rep = {self.store_type: dataStore}
         self._client().put_json(self._url(None), json.dumps(target_rep))
 
 
@@ -254,11 +261,11 @@ class Layer(_UploadBase):
     )
 
     def set_target_layer_name(self, name):
-        data = { 'layer' : { 'name' : name }}
+        data = {'layer': {'name': name}}
         self._client().put_json(self._url(None), json.dumps(data))
 
     def set_target_srs(self, srs):
-        data = { 'layer' : { 'srs': srs }}
+        data = {'layer': {'srs': srs}}
         self._client().put_json(self._url(None), json.dumps(data))
 
 
@@ -269,7 +276,7 @@ class Task(_UploadBase):
         _binding('href'),
         _binding('state'),
         _binding('progress'),
-        _binding('updateMode', expected=False), # workaround for older versions
+        _binding('updateMode', expected=False),  # workaround for older versions
         _binding('data', binding=Data),
         # a missing target implies the source must be imported into db
         _binding('target', binding=Target, expected=False),
@@ -295,35 +302,35 @@ class Task(_UploadBase):
             if workspace is None:
                 raise Exception("workspace required if target is not set")
             if store_type not in Target._store_types:
-                raise Exception("store_type must be one of %s" % (Target._store_types,))
+                raise Exception("store_type must be one of %s" % (Target._store_types))
             self.target = Target(None, self)
             self.target.store_type = store_type
             self.target.href = self._url(None) + "/target"
         self.target.change_datastore(store_name, workspace)
 
-    def set_update_mode(self,update_mode):
-        data = { 'task' : {
-            'updateMode' : update_mode
+    def set_update_mode(self, update_mode):
+        data = {'task': {
+            'updateMode': update_mode
         }}
         self._client().put_json(self._url(None), json.dumps(data))
 
-    def set_charset(self,charset):
-        data = { 'task' : {
-            'source' : {
-                'charset' : charset
+    def set_charset(self, charset):
+        data = {'task': {
+            'source': {
+                'charset': charset
             }
         }}
         self._client().put_json(self._url(None), json.dumps(data))
 
     def set_srs(self, srs):
-        data = { 'layer' : { 'srs' : srs }}
+        data = {'layer': {'srs': srs}}
         self._client().put_json(self._url(None), json.dumps(data))
 
     def delete(self):
         """Delete the task"""
         resp, content = self._client().delete(self._url(None))
         if resp.status != 204:
-            raise Exception('expected 204 response code, got %s' % resp.status,content)
+            raise Exception('expected 204 response code, got %s' % resp.status, content)
 
     def set_transforms(self, transforms, save=True):
         """Set the transforms of this Item. transforms is a list of dicts"""
@@ -335,7 +342,7 @@ class Task(_UploadBase):
             "type": self.transform_type,
             "transforms": self.transforms
         }
-        data = { 'task' : { 'transformChain' : chain}}
+        data = {'task': {'transformChain': chain}}
         self._client().put_json(self._url(None), json.dumps(data))
 
     def add_transforms(self, transforms, save=True):
@@ -345,9 +352,9 @@ class Task(_UploadBase):
     def remove_transforms(self, transforms, by_field=None, save=True):
         '''remove transforms by equality or list of field values'''
         if by_field:
-            self.transforms = [ t for t in self.transforms if t[by_field] not in transforms ]
+            self.transforms = [t for t in self.transforms if t[by_field] not in transforms]
         else:
-            self.transforms = [ t for t in self.transforms if t not in transforms ]
+            self.transforms = [t for t in self.transforms if t not in transforms]
         save and self.save_transforms()
 
     def get_progress(self):
@@ -369,8 +376,8 @@ class Task(_UploadBase):
                 if unicode_error:
                     progress['message'] += ' - it looks like an invalid character'
                 return progress
-            except ValueError as ex:
-                _logger.warn('invalid JSON response: %s',response)
+            except ValueError:
+                _logger.warn('invalid JSON response: %s', response)
                 raise RequestFailed('invalid JSON')
         else:
             raise Exception("Item does not have a progress endpoint")
@@ -405,12 +412,13 @@ class Session(_UploadBase):
         # @todo getting the task response updates the session tasks, but
         # neglects to retreive the overall session status field
         fname = os.path.basename(files[0])
-        _,ext = os.path.splitext(fname)
+        _, ext = os.path.splitext(fname)
+
         def addopts(base):
             if initial_opts:
                 # pass options in as value:key parameters, this allows multiple
                 # options per key
-                base = base + '&' + '&'.join(['option=%s:%s' % (v,k) for k,v in initial_opts.items()])
+                base = base + '&' + '&'.join(['option=%s:%s' % (v, k) for k, v in initial_opts.items()])
             return base
         if use_url:
             if ext == '.zip':
@@ -426,7 +434,7 @@ class Session(_UploadBase):
         else:
             url = self._url("imports/%s/tasks?expand=3" % self.id)
             resp = self._client().post_multipart(addopts(url), files)
-        tasks = parse_response( resp )
+        tasks = parse_response(resp)
         if not isinstance(tasks, list):
             tasks = [tasks]
         for t in tasks:
@@ -436,16 +444,16 @@ class Session(_UploadBase):
     def commit(self, sync=False):
         """Run the session"""
         #@todo check task status if we don't have it already?
-        url = self._url("imports/%s",self.id)
+        url = self._url("imports/%s", self.id)
         if sync:
             url = url + "?sync=true&exec=true"
         resp, content = self._client().post(url)
         if resp.status != 204:
-            raise Exception("expected 204 response code, got %s" % resp.status,content)
+            raise Exception("expected 204 response code, got %s" % resp.status, content)
 
     def delete(self):
         """Delete this import session"""
-        url = self._url("imports/%s",self.id)
+        url = self._url("imports/%s", self.id)
         resp, content = self._client().delete(url)
         if resp.status != 204:
-            raise Exception('expected 204 response code, got %s' % resp.status,content)
+            raise Exception('expected 204 response code, got %s' % resp.status, content)
