@@ -14,7 +14,7 @@ test_dependencies = [
 
 
 setup(name = "gn_gsimporter",
-    version = "1.0.15",
+    version = "1.0.16",
     description = "GeoNode GeoServer Importer Client",
     keywords = "GeoNode GeoServer Importer",
     license = "MIT",
