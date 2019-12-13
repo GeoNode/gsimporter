@@ -1,23 +1,22 @@
 import os
-from . import _util
-import pprint
 import json
+import pprint
 import logging
+import urllib3
 import mimetypes
-
+from six import string_types
 from gsimporter.api import (RequestFailed,
                             BadRequest,
                             NotFound,
                             parse_response)
-
-# import httplib2
-import urllib3
 
 try:
     from urllib.parse import urlparse, urlencode
 except ImportError:  # python2 compatible
     from urlparse import urlparse
     from urllib import urlencode
+
+from . import _util
 
 _logger = logging.getLogger(__name__)
 
@@ -285,7 +284,7 @@ class _Client(object):
             L.append(str(value))
         for fpair in files:
             try:
-                if isinstance(fpair, str):
+                if isinstance(fpair, string_types):
                     fpair = (fpair, fpair)
             except BaseException:
                 if isinstance(fpair, str):
