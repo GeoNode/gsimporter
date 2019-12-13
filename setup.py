@@ -14,7 +14,7 @@ test_dependencies = [
 
 
 setup(name = "gn_gsimporter",
-    version = "1.0.16",
+    version = "1.0.17",
     description = "GeoNode GeoServer Importer Client",
     keywords = "GeoNode GeoServer Importer",
     license = "MIT",
@@ -23,7 +23,8 @@ setup(name = "gn_gsimporter",
     author_email = "ischneider@opengeo.org",
     install_requires = [
         'httplib2',
-        'urllib3'
+        'urllib3',
+        'six'
     ],
     tests_require = test_dependencies,
     extras_require = {

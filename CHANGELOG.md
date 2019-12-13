@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.17](https://github.com/GeoNode/gsimporter/releases/tag/1.0.17)
+
+**Featrues**
+
+ - [Regression on upgrade gsimporter to be compatible with python2&3](https://github.com/GeoNode/gsimporter/pull/10)
+
+### [Resolved Issues](https://github.com/GeoNode/gsimporter/pulls?q=is%3Apr+is%3Aclosed+milestone%3A1.0.17)
+
+### [Full Changelog](https://github.com/GeoNode/gsimporter/compare/1.0.16...be2d7e1c4a07045d58dc8551fb1112b476f88027)
+
 ## [1.0.16](https://github.com/GeoNode/gsimporter/releases/tag/1.0.16)
 
 **Featrues**
