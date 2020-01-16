@@ -271,7 +271,6 @@ class _Client(object):
         fields is a sequence of (name, value) elements for regular form fields.
         files is a sequence of name or (name,filename) or (name, filename, value)
         elements for data to be uploaded as files
-
         """
         BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
         CRLF = '\r\n'
@@ -301,7 +300,7 @@ class _Client(object):
             L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (str(key), str(filename)))
             L.append('Content-Type: %s' % str(_get_content_type(filename)))
             L.append('')
-            L.append(value)
+            L.append(value.decode('ISO-8859-1'))
         L.append('--' + BOUNDARY + '--')
         L.append('')
         return self._request(

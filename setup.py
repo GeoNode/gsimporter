@@ -14,7 +14,7 @@ test_dependencies = [
 
 
 setup(name = "gn_gsimporter",
-    version = "1.0.17",
+    version = "2.0.0c",
     description = "GeoNode GeoServer Importer Client",
     keywords = "GeoNode GeoServer Importer",
     license = "MIT",
@@ -33,6 +33,20 @@ setup(name = "gn_gsimporter",
     packages=find_packages(),
     include_package_data = True,
     zip_safe = False,
-    classifiers  = [],
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering :: GIS',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
     test_suite = 'test.uploadtests'
 )

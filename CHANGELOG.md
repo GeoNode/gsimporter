@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.0.0 [2020-01-16]
+<li> 2020-01-14: Python 3 / Django 2 Compatibility</li>
+
 ## [1.0.17](https://github.com/GeoNode/gsimporter/releases/tag/1.0.17)
 
 **Featrues**

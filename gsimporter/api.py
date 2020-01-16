@@ -46,7 +46,7 @@ def parse_response(args, parent=None):
     '''
     headers, response = args
     try:
-        resp = json.loads(response)
+        resp = json.loads(response.decode('ISO-8859-1'))
     except ValueError as ex:
         _logger.warn('invalid JSON response: %s', response)
         raise ex
