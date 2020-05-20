@@ -285,7 +285,7 @@ class _Client(object):
             try:
                 if isinstance(fpair, string_types):
                     fpair = (fpair, fpair)
-            except BaseException:
+            except Exception:
                 if isinstance(fpair, str):
                     fpair = (fpair, fpair)
             key = fpair[0]

@@ -15,7 +15,7 @@ def shp_files(fpath):
 
 def create_zip(fpaths):
     _, payload = tempfile.mkstemp(suffix='.zip')
-    zipf = ZipFile(payload, "w")
+    zipf = ZipFile(payload, "w", allowZip64=True)
     for fp in fpaths:
         basename = path.basename(fp)
         zipf.write(fp, basename)
